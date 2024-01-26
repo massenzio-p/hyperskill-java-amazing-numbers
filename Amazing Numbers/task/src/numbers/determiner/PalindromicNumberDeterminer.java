@@ -1,8 +1,8 @@
-package numbers;
+package numbers.determiner;
 
-import java.util.Locale;
+import numbers.NumberReport;
 
-public class PalindromicNumberDeterminer implements NumbersDeterminer {
+class PalindromicNumberDeterminer implements NumbersDeterminer {
     @Override
     public boolean getProperty(long number) {
         String stringNumber = Long.toString(number);
@@ -12,5 +12,10 @@ public class PalindromicNumberDeterminer implements NumbersDeterminer {
             }
         }
         return true;
+    }
+
+    @Override
+    public void setPropertyInReport(NumberReport report) {
+        report.setPalindromic(getProperty(report.getNumber()));
     }
 }

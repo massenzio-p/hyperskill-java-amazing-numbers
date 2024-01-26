@@ -606,6 +606,135 @@ files:
           enum Parameter {ONE, TWO, THREE}
       }
     learner_created: false
+  - name: src/numbers/determiner/BuzzNumberDeterminer.java
+    visible: true
+    text: |
+      package numbers;
+      
+      import java.util.Scanner;
+      
+      class BuzzNumberDeterminer implements NumbersDeterminer {
+      
+          private final static int DIVISIBLE_CODE = 1;
+          private final static int ENDS_WITH_7_CODE = 2;
+      
+          @Override
+          public boolean getProperty(long number) {
+              return isBuzz(number);
+          }
+      
+          private boolean isBuzz(long number) {
+              int resCode = 0;
+              if (number % 7 == 0) {
+                  resCode += DIVISIBLE_CODE;
+              }
+              if ((number - 7) % 10 == 0) {
+                  resCode += ENDS_WITH_7_CODE;
+              }
+              return resCode > 0;
+          }
+      }
+    learner_created: true
+  - name: src/numbers/determiner/NumbersDeterminer.java
+    visible: true
+    text: |
+      package numbers;
+      
+      public interface NumbersDeterminer {
+          boolean getProperty(long number);
+      }
+    learner_created: true
+  - name: src/numbers/determiner/PalindromicNumberDeterminer.java
+    visible: true
+    text: |
+      package numbers;
+      
+      import java.util.Locale;
+      
+      public class PalindromicNumberDeterminer implements NumbersDeterminer {
+          @Override
+          public boolean getProperty(long number) {
+              String stringNumber = Long.toString(number);
+              for (int i = 0; i < stringNumber.length() / 2; i++) {
+                  if (stringNumber.charAt(i) != stringNumber.charAt(stringNumber.length() - i - 1)) {
+                      return false;
+                  }
+              }
+              return true;
+          }
+      }
+    learner_created: true
+  - name: src/numbers/determiner/DuckNumberDeterminer.java
+    visible: true
+    text: |
+      package numbers;
+      
+      public class DuckNumberDeterminer implements NumbersDeterminer {
+      
+          @Override
+          public boolean getProperty(long number) {
+              for (char ch : Long.toString(number).toCharArray()) {
+                  if (ch == '0') return true;
+              }
+              return false;
+          }
+      }
+    learner_created: true
+  - name: src/numbers/NumberUtils.java
+    visible: true
+    text: |
+      package numbers;
+      
+      public class NumberUtils {
+      
+          static boolean isNatural(long number) {
+              if (number > 0) {
+                  return true;
+              }
+              return false;
+          }
+      
+          static boolean isEven(long number) {
+              return number % 2 == 0;
+          }
+      }
+    learner_created: true
+  - name: src/numbers/AmazingNumbersGame.java
+    visible: true
+    learner_created: true
+  - name: src/numbers/printer/NumbersPrinter.java
+    visible: true
+    learner_created: true
+  - name: src/numbers/printer/BriefNumberPrinter.java
+    visible: true
+    learner_created: true
+  - name: src/numbers/AmazingNumberGameImpl.java
+    visible: true
+    learner_created: true
+  - name: src/numbers/printer/PrinterFactory.java
+    visible: true
+    learner_created: true
+  - name: src/numbers/determiner/NumberDeterminerFactory.java
+    visible: true
+    learner_created: true
+  - name: src/numbers/determiner/GapNumberDeterminer.java
+    visible: true
+    learner_created: true
+  - name: src/numbers/printer/DetailedNumberPrinter.java
+    visible: true
+    learner_created: true
+  - name: src/numbers/NumberReport.java
+    visible: true
+    learner_created: true
+  - name: src/numbers/NumberReportModel.java
+    visible: true
+    learner_created: true
+  - name: src/numbers/determiner/EvenDeterminer.java
+    visible: true
+    learner_created: true
 feedback_link: https://hyperskill.org/projects/184/stages/934/implement#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: "Fri, 26 Jan 2024 18:05:13 UTC"
 record: -1

@@ -1,6 +1,6 @@
-package numbers;
+package numbers.determiner;
 
-import java.util.Scanner;
+import numbers.NumberReport;
 
 class BuzzNumberDeterminer implements NumbersDeterminer {
 
@@ -10,6 +10,11 @@ class BuzzNumberDeterminer implements NumbersDeterminer {
     @Override
     public boolean getProperty(long number) {
         return isBuzz(number);
+    }
+
+    @Override
+    public void setPropertyInReport(NumberReport report) {
+        report.setBuzz(getProperty(report.getNumber()));
     }
 
     private boolean isBuzz(long number) {
