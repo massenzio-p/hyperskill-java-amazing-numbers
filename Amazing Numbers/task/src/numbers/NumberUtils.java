@@ -2,15 +2,14 @@ package numbers;
 
 public class NumberUtils {
 
-    static boolean isNatural(int number) {
+    static boolean isNatural(long number) {
         if (number > 0) {
             return true;
         }
-        System.out.println("This number is not natural!");
         return false;
     }
 
-    static boolean isEven(int number) {
+    static boolean isEven(long number) {
         return number % 2 == 0;
     }
 }

@@ -8,11 +8,11 @@ class BuzzNumberDeterminer implements NumbersDeterminer {
     private final static int ENDS_WITH_7_CODE = 2;
 
     @Override
-    public boolean getProperty(int number) {
+    public boolean getProperty(long number) {
         return isBuzz(number);
     }
 
-    private boolean isBuzz(int number) {
+    private boolean isBuzz(long number) {
         int resCode = 0;
         if (number % 7 == 0) {
             resCode += DIVISIBLE_CODE;

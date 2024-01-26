@@ -1,5 +1,5 @@
 package numbers;
 
 public interface NumbersDeterminer {
-    boolean getProperty(int number);
+    boolean getProperty(long number);
 }

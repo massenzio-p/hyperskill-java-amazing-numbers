@@ -382,6 +382,86 @@ files:
           }
       }
     learner_created: false
+  - name: src/numbers/BuzzNumberDeterminer.java
+    visible: true
+    text: |
+      package numbers;
+      
+      import java.util.Scanner;
+      
+      class BuzzNumberDeterminer implements NumbersDeterminer {
+      
+          private final static int DIVISIBLE_CODE = 1;
+          private final static int ENDS_WITH_7_CODE = 2;
+      
+          @Override
+          public boolean getProperty(int number) {
+              return isBuzz(number);
+          }
+      
+          private boolean isBuzz(int number) {
+              int resCode = 0;
+              if (number % 7 == 0) {
+                  resCode += DIVISIBLE_CODE;
+              }
+              if ((number - 7) % 10 == 0) {
+                  resCode += ENDS_WITH_7_CODE;
+              }
+              return resCode > 0;
+          }
+      }
+    learner_created: true
+  - name: src/numbers/NumbersDeterminer.java
+    visible: true
+    text: |
+      package numbers;
+      
+      public interface NumbersDeterminer {
+          boolean getProperty(int number);
+      }
+    learner_created: true
+  - name: src/numbers/DuckNumberDeterminer.java
+    visible: true
+    text: |
+      package numbers;
+      
+      public class DuckNumberDeterminer implements NumbersDeterminer {
+      
+          @Override
+          public boolean getProperty(int number) {
+              for (char ch : Integer.toString(number).toCharArray()) {
+                  if (ch == '0') return true;
+              }
+              return false;
+          }
+      }
+    learner_created: true
+  - name: src/numbers/NumberUtils.java
+    visible: true
+    text: |
+      package numbers;
+      
+      public class NumberUtils {
+      
+          static boolean isNatural(int number) {
+              if (number > 0) {
+                  return true;
+              }
+              System.out.println("This number is not natural!");
+              return false;
+          }
+      
+          static boolean isEven(int number) {
+              return number % 2 == 0;
+          }
+      }
+    learner_created: true
+  - name: src/numbers/PalindromicNumberDeterminer.java
+    visible: true
+    learner_created: true
 feedback_link: https://hyperskill.org/projects/184/stages/933/implement#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: "Fri, 26 Jan 2024 14:14:20 UTC"
 record: -1
