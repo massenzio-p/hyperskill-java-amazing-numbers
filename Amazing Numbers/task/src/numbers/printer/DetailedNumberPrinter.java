@@ -11,7 +11,8 @@ public class DetailedNumberPrinter implements NumbersPrinter {
                           buzz: %b
                           duck: %b
                    palindromic: %b
-                        gapful: %b%n""";
+                        gapful: %b
+                           spy: %b%n""";
 
     @Override
     public void print(NumberReport number) {
@@ -23,7 +24,8 @@ public class DetailedNumberPrinter implements NumbersPrinter {
                 number.isBuzz(),
                 number.isDuck(),
                 number.isPalindromic(),
-                number.isGap()
+                number.isGap(),
+                number.isSpy()
         );
     }
 }

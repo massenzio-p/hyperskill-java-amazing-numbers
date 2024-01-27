@@ -1,6 +1,7 @@
 package numbers;
 
 import numbers.determiner.NumbersDeterminer;
+import numbers.filter.Filter;
 import numbers.printer.NumbersPrinter;
 
 import java.util.Collection;
@@ -10,26 +11,33 @@ public class AmazingNumberGameImpl implements AmazingNumbersGame {
     private final Collection<NumbersDeterminer> determiners;
 
     private NumbersPrinter printer;
+    private Filter filter;
 
-    public AmazingNumberGameImpl(Collection<NumbersDeterminer> determiners,
-                                 NumbersPrinter printer) {
+    public AmazingNumberGameImpl(Collection<NumbersDeterminer> determiners) {
         this.determiners = determiners;
-        this.printer = printer;
     }
 
     @Override
-    public void playAmazingNumbers(long[] numbers) {
-        for (long num : numbers) {
-            NumberReport report = new NumberReportModel(num);
+    public void playAmazingNumbers(long start, int number) {
+        for (long num = 0; num < number; start++) {
+            NumberReport report = new NumberReportModel(start);
             for (NumbersDeterminer determiner : determiners) {
                 determiner.setPropertyInReport(report);
             }
-            this.printer.print(report);
+            if (filter == null || filter.filter(report)) {
+                this.printer.print(report);
+                num++;
+            }
         }
     }
 
     @Override
     public void setPrintStrategy(NumbersPrinter numbersPrinter) {
         this.printer = numbersPrinter;
+    }
+
+    @Override
+    public void setFilter(Filter filter) {
+        this.filter = filter;
     }
 }

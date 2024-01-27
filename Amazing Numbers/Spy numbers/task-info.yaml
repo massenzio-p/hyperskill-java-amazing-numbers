@@ -689,6 +689,438 @@ files:
           enum Parameter {ONE, TWO, THREE}
       }
     learner_created: false
+  - name: src/numbers/determiner/GapNumberDeterminer.java
+    visible: true
+    text: |
+      package numbers.determiner;
+      
+      import numbers.NumberReport;
+      
+      class GapNumberDeterminer implements NumbersDeterminer {
+          @Override
+          public boolean getProperty(long number) {
+              String strNumber = Long.toString(number);
+      
+              if (strNumber.length() < 3) return false;
+      
+              int divider = Integer.parseInt(String.format(
+                      "%c%c",
+                      strNumber.charAt(0),
+                      strNumber.charAt(strNumber.length() - 1)));
+              return number % divider == 0;
+          }
+      
+          @Override
+          public void setPropertyInReport(NumberReport report) {
+              report.setGap(getProperty(report.getNumber()));
+          }
+      }
+    learner_created: true
+  - name: src/numbers/determiner/PalindromicNumberDeterminer.java
+    visible: true
+    text: |
+      package numbers.determiner;
+      
+      import numbers.NumberReport;
+      
+      class PalindromicNumberDeterminer implements NumbersDeterminer {
+          @Override
+          public boolean getProperty(long number) {
+              String stringNumber = Long.toString(number);
+              for (int i = 0; i < stringNumber.length() / 2; i++) {
+                  if (stringNumber.charAt(i) != stringNumber.charAt(stringNumber.length() - i - 1)) {
+                      return false;
+                  }
+              }
+              return true;
+          }
+      
+          @Override
+          public void setPropertyInReport(NumberReport report) {
+              report.setPalindromic(getProperty(report.getNumber()));
+          }
+      }
+    learner_created: true
+  - name: src/numbers/NumberReportModel.java
+    visible: true
+    text: |
+      package numbers;
+      
+      public class NumberReportModel implements NumberReport {
+      
+          private final long number;
+          private boolean isEven;
+          private boolean isBuzz;
+          private boolean isDuck;
+          private boolean isPalindromic;
+          private boolean isGap;
+      
+          public NumberReportModel(long number) {
+              this.number = number;
+          }
+      
+          @Override
+          public long getNumber() {
+              return this.number;
+          }
+      
+          @Override
+          public boolean isEven() {
+              return this.isEven;
+          }
+      
+          @Override
+          public boolean isBuzz() {
+              return this.isBuzz;
+          }
+      
+          @Override
+          public boolean isDuck() {
+              return this.isDuck;
+          }
+      
+          @Override
+          public boolean isPalindromic() {
+              return this.isPalindromic;
+          }
+      
+          @Override
+          public boolean isGap() {
+              return this.isGap;
+          }
+      
+          @Override
+          public void setEven(boolean isEven) {
+              this.isEven = isEven;
+          }
+      
+          @Override
+          public void setBuzz(boolean isBuzz) {
+              this.isBuzz = isBuzz;
+          }
+      
+          @Override
+          public void setDuck(boolean isDuck) {
+              this.isDuck = isDuck;
+          }
+      
+          @Override
+          public void setPalindromic(boolean isPalindromic) {
+              this.isPalindromic = isPalindromic;
+          }
+      
+          @Override
+          public void setGap(boolean isGap) {
+              this.isGap = isGap;
+          }
+      }
+    learner_created: true
+  - name: src/numbers/determiner/EvenDeterminer.java
+    visible: true
+    text: |
+      package numbers.determiner;
+      
+      import numbers.NumberReport;
+      import numbers.NumberUtils;
+      
+      public class EvenDeterminer implements NumbersDeterminer {
+          @Override
+          public boolean getProperty(long number) {
+              return NumberUtils.isEven(number);
+          }
+      
+          @Override
+          public void setPropertyInReport(NumberReport report) {
+              report.setEven(getProperty(report.getNumber()));
+          }
+      }
+    learner_created: true
+  - name: src/numbers/printer/PrinterFactory.java
+    visible: true
+    text: |
+      package numbers.printer;
+      
+      public class PrinterFactory {
+      
+          public enum PrinterMode {
+              BRIEF, DETAILED
+          }
+      
+          public static NumbersPrinter createPrintStrategy(PrinterMode mode) {
+              return switch (mode) {
+                  case BRIEF -> new BriefNumberPrinter();
+                  default -> new DetailedNumberPrinter();
+              };
+          }
+      }
+    learner_created: true
+  - name: src/numbers/NumberReport.java
+    visible: true
+    text: |
+      package numbers;
+      
+      public interface NumberReport {
+          long getNumber();
+          boolean isEven();
+          boolean isBuzz();
+          boolean isDuck();
+          boolean isPalindromic();
+          boolean isGap();
+          void setEven(boolean isEven);
+          void setBuzz(boolean isBuzz);
+          void setDuck(boolean isDuck);
+          void setPalindromic(boolean isPalindromic);
+          void setGap(boolean isGap);
+      }
+    learner_created: true
+  - name: src/numbers/printer/NumbersPrinter.java
+    visible: true
+    text: |
+      package numbers.printer;
+      
+      import numbers.NumberReport;
+      
+      public interface NumbersPrinter {
+      
+          void print(NumberReport number);
+      }
+    learner_created: true
+  - name: src/numbers/AmazingNumbersGame.java
+    visible: true
+    text: |
+      package numbers;
+      
+      import numbers.printer.NumbersPrinter;
+      
+      public interface AmazingNumbersGame {
+      
+          void playAmazingNumbers(long[] numbers);
+          void setPrintStrategy(NumbersPrinter numbersPrinter);
+      }
+    learner_created: true
+  - name: src/numbers/printer/BriefNumberPrinter.java
+    visible: true
+    text: |
+      package numbers.printer;
+      
+      import numbers.NumberReport;
+      import numbers.printer.NumbersPrinter;
+      
+      public class BriefNumberPrinter implements NumbersPrinter {
+          public static final String PATTERN = "             %d is %s%s%s%s%s%n";
+      
+          @Override
+          public void print(NumberReport number) {
+              System.out.printf(
+                      PATTERN,
+                      number.getNumber(),
+                      number.isBuzz() ? "buzz, " : "",
+                      number.isDuck() ? "duck, " : "",
+                      number.isPalindromic() ? "palindromic, " : "",
+                      number.isGap() ? "gapful, " : "",
+                      number.isEven() ? "even" : "odd"
+              );
+          }
+      }
+    learner_created: true
+  - name: src/numbers/determiner/NumberDeterminerFactory.java
+    visible: true
+    text: |
+      package numbers.determiner;
+      
+      
+      public class NumberDeterminerFactory {
+      
+          public enum DeterminerType {
+              BUZZ, DUCK, PALINDROMIC, GAP, EVEN
+          }
+      
+          public static NumbersDeterminer createNumberDeterminer(DeterminerType type) {
+              return switch (type) {
+                  case BUZZ -> new BuzzNumberDeterminer();
+                  case DUCK -> new DuckNumberDeterminer();
+                  case PALINDROMIC -> new PalindromicNumberDeterminer();
+                  case GAP -> new GapNumberDeterminer();
+                  case EVEN -> new EvenDeterminer();
+              };
+          }
+      }
+    learner_created: true
+  - name: src/numbers/determiner/DuckNumberDeterminer.java
+    visible: true
+    text: |
+      package numbers.determiner;
+      
+      import numbers.NumberReport;
+      
+      class DuckNumberDeterminer implements NumbersDeterminer {
+      
+          @Override
+          public boolean getProperty(long number) {
+              for (char ch : Long.toString(number).toCharArray()) {
+                  if (ch == '0') return true;
+              }
+              return false;
+          }
+      
+          @Override
+          public void setPropertyInReport(NumberReport report) {
+              report.setDuck(getProperty(report.getNumber()));
+          }
+      }
+    learner_created: true
+  - name: src/numbers/AmazingNumberGameImpl.java
+    visible: true
+    text: |
+      package numbers;
+      
+      import numbers.determiner.NumbersDeterminer;
+      import numbers.printer.NumbersPrinter;
+      
+      import java.util.Collection;
+      
+      public class AmazingNumberGameImpl implements AmazingNumbersGame {
+      
+          private final Collection<NumbersDeterminer> determiners;
+      
+          private NumbersPrinter printer;
+      
+          public AmazingNumberGameImpl(Collection<NumbersDeterminer> determiners,
+                                       NumbersPrinter printer) {
+              this.determiners = determiners;
+              this.printer = printer;
+          }
+      
+          @Override
+          public void playAmazingNumbers(long[] numbers) {
+              for (long num : numbers) {
+                  NumberReport report = new NumberReportModel(num);
+                  for (NumbersDeterminer determiner : determiners) {
+                      determiner.setPropertyInReport(report);
+                  }
+                  this.printer.print(report);
+              }
+          }
+      
+          @Override
+          public void setPrintStrategy(NumbersPrinter numbersPrinter) {
+              this.printer = numbersPrinter;
+          }
+      }
+    learner_created: true
+  - name: src/numbers/determiner/BuzzNumberDeterminer.java
+    visible: true
+    text: |
+      package numbers.determiner;
+      
+      import numbers.NumberReport;
+      
+      class BuzzNumberDeterminer implements NumbersDeterminer {
+      
+          private final static int DIVISIBLE_CODE = 1;
+          private final static int ENDS_WITH_7_CODE = 2;
+      
+          @Override
+          public boolean getProperty(long number) {
+              return isBuzz(number);
+          }
+      
+          @Override
+          public void setPropertyInReport(NumberReport report) {
+              report.setBuzz(getProperty(report.getNumber()));
+          }
+      
+          private boolean isBuzz(long number) {
+              int resCode = 0;
+              if (number % 7 == 0) {
+                  resCode += DIVISIBLE_CODE;
+              }
+              if ((number - 7) % 10 == 0) {
+                  resCode += ENDS_WITH_7_CODE;
+              }
+              return resCode > 0;
+          }
+      }
+    learner_created: true
+  - name: src/numbers/determiner/NumbersDeterminer.java
+    visible: true
+    text: |
+      package numbers.determiner;
+      
+      import numbers.NumberReport;
+      
+      public interface NumbersDeterminer {
+          boolean getProperty(long number);
+          void setPropertyInReport(NumberReport report);
+      }
+    learner_created: true
+  - name: src/numbers/printer/DetailedNumberPrinter.java
+    visible: true
+    text: |
+      package numbers.printer;
+      
+      import numbers.NumberReport;
+      
+      public class DetailedNumberPrinter implements NumbersPrinter {
+      
+          private final static String PATTERN = """
+                  %nProperties of %d
+                                even: %b
+                                 odd: %b
+                                buzz: %b
+                                duck: %b
+                         palindromic: %b
+                              gapful: %b%n""";
+      
+          @Override
+          public void print(NumberReport number) {
+              System.out.printf(
+                      PATTERN,
+                      number.getNumber(),
+                      number.isEven(),
+                      !number.isEven(),
+                      number.isBuzz(),
+                      number.isDuck(),
+                      number.isPalindromic(),
+                      number.isGap()
+              );
+          }
+      }
+    learner_created: true
+  - name: src/numbers/NumberUtils.java
+    visible: true
+    text: |
+      package numbers;
+      
+      public class NumberUtils {
+      
+          public static boolean isNatural(long number) {
+              if (number > 0) {
+                  return true;
+              }
+              return false;
+          }
+      
+          public static boolean isEven(long number) {
+              return number % 2 == 0;
+          }
+      }
+    learner_created: true
+  - name: src/numbers/filter/Filter.java
+    visible: true
+    learner_created: true
+  - name: src/numbers/filter/FilterFactory.java
+    visible: true
+    learner_created: true
+  - name: src/numbers/filter/FilterType.java
+    visible: true
+    learner_created: true
+  - name: src/numbers/determiner/SpyDeterminer.java
+    visible: true
+    learner_created: true
 feedback_link: https://hyperskill.org/projects/184/stages/935/implement#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: "Sat, 27 Jan 2024 14:21:36 UTC"
 record: -1
