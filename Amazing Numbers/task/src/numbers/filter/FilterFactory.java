@@ -21,6 +21,8 @@ public class FilterFactory {
             case PALINDROMIC -> (NumberReport::isPalindromic);
             case GAPFUL -> (NumberReport::isGap);
             case SPY -> (NumberReport::isSpy);
+            case SUNNY -> (NumberReport::isSunny);
+            case SQUARE -> (NumberReport::isSquare);
         };
     }
 }

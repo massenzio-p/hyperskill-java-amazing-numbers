@@ -8,11 +8,14 @@ public interface NumberReport {
     boolean isPalindromic();
     boolean isGap();
     boolean isSpy();
+    boolean isSquare();
+    boolean isSunny();
     void setEven(boolean isEven);
-    void setOdd(boolean isOdd);
     void setBuzz(boolean isBuzz);
     void setDuck(boolean isDuck);
     void setPalindromic(boolean isPalindromic);
     void setGap(boolean isGap);
     void setSpy(boolean spy);
+    void setSunny(boolean isSunny);
+    void setSquare(boolean isSquare);
 }

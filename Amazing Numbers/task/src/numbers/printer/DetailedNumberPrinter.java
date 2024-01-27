@@ -12,6 +12,8 @@ public class DetailedNumberPrinter implements NumbersPrinter {
                           duck: %b
                    palindromic: %b
                         gapful: %b
+                        square: %b
+                         sunny: %b
                            spy: %b%n""";
 
     @Override
@@ -25,6 +27,8 @@ public class DetailedNumberPrinter implements NumbersPrinter {
                 number.isDuck(),
                 number.isPalindromic(),
                 number.isGap(),
+                number.isSquare(),
+                number.isSunny(),
                 number.isSpy()
         );
     }

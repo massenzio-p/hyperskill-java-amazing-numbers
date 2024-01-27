@@ -1,11 +1,11 @@
 package numbers;
 
+import numbers.config.GameConfig;
 import numbers.filter.Filter;
 import numbers.printer.NumbersPrinter;
 
+
 public interface AmazingNumbersGame {
 
-    void playAmazingNumbers(long start, int number);
-    void setPrintStrategy(NumbersPrinter numbersPrinter);
-    void setFilter(Filter filter);
+    void playAmazingNumbers(GameConfig config);
 }

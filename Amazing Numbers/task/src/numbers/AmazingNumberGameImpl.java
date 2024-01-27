@@ -1,5 +1,6 @@
 package numbers;
 
+import numbers.config.GameConfig;
 import numbers.determiner.NumbersDeterminer;
 import numbers.filter.Filter;
 import numbers.printer.NumbersPrinter;
@@ -10,34 +11,31 @@ public class AmazingNumberGameImpl implements AmazingNumbersGame {
 
     private final Collection<NumbersDeterminer> determiners;
 
-    private NumbersPrinter printer;
-    private Filter filter;
-
     public AmazingNumberGameImpl(Collection<NumbersDeterminer> determiners) {
         this.determiners = determiners;
     }
 
     @Override
-    public void playAmazingNumbers(long start, int number) {
-        for (long num = 0; num < number; start++) {
-            NumberReport report = new NumberReportModel(start);
+    public void playAmazingNumbers(GameConfig config) {
+        for (long num = config.getStartNumber(), counter = 0; counter < config.getRepeats(); num++) {
+            NumberReport report = new NumberReportModel(num);
             for (NumbersDeterminer determiner : determiners) {
                 determiner.setPropertyInReport(report);
             }
-            if (filter == null || filter.filter(report)) {
-                this.printer.print(report);
-                num++;
+
+            Collection<Filter> filters = config.getFilters();
+            if (filters != null && !filters.isEmpty()) {
+                boolean continueLoop = false;
+                for (Filter filter : filters) {
+                    if (!filter.filter(report)) {
+                        continueLoop = true;
+                        break;
+                    }
+                }
+                if (continueLoop) continue;
             }
+            counter++;
+            config.getPrinter().print(report);
         }
-    }
-
-    @Override
-    public void setPrintStrategy(NumbersPrinter numbersPrinter) {
-        this.printer = numbersPrinter;
-    }
-
-    @Override
-    public void setFilter(Filter filter) {
-        this.filter = filter;
     }
 }

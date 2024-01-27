@@ -4,12 +4,14 @@ public class NumberReportModel implements NumberReport {
 
     private final long number;
     private boolean isEven;
-    private boolean isOdd;
     private boolean isBuzz;
     private boolean isDuck;
     private boolean isPalindromic;
     private boolean isGap;
     private boolean isSpy;
+
+    private boolean isSquare;
+    private boolean isSunny;
 
     public NumberReportModel(long number) {
         this.number = number;
@@ -41,6 +43,15 @@ public class NumberReportModel implements NumberReport {
         return this.isGap;
     }
     @Override
+    public boolean isSquare() {
+        return isSquare;
+    }
+    @Override
+    public boolean isSunny() {
+        return isSunny;
+    }
+
+    @Override
     public void setEven(boolean isEven) {
         this.isEven = isEven;
     }
@@ -69,7 +80,11 @@ public class NumberReportModel implements NumberReport {
         this.isSpy = spy;
     }
     @Override
-    public void setOdd(boolean isOdd) {
-        this.isOdd = isOdd;
+    public void setSquare(boolean isSquare) {
+        this.isSquare = isSquare;
+    }
+    @Override
+    public void setSunny(boolean isSunny) {
+        this.isSunny = isSunny;
     }
 }
