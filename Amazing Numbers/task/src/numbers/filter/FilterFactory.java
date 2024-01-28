@@ -23,6 +23,7 @@ public class FilterFactory {
             case SPY -> (NumberReport::isSpy);
             case SUNNY -> (NumberReport::isSunny);
             case SQUARE -> (NumberReport::isSquare);
+            case JUMPING -> (NumberReport::isJumping);
         };
     }
 }

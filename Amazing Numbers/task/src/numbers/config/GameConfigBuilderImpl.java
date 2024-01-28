@@ -43,7 +43,7 @@ public class GameConfigBuilderImpl implements GameConfigBuilder {
             printer = PrinterFactory.createPrintStrategy(PrinterFactory.PrinterMode.BRIEF);
             int repeats = Integer.parseInt(input[1]);
 
-            validateSecondArt(repeats);
+            validateSecondArg(repeats);
             config.setRepeats(repeats);
 
             if (mode == GameMode.FILTERED_SET_OF_NUMBERS) {
@@ -65,17 +65,18 @@ public class GameConfigBuilderImpl implements GameConfigBuilder {
     private Collection<Filter> mapFilters(String[] strFilters) throws InvalidInputException {
         Collection<FilterType> filterTypes = new HashSet<>();
 
-        FilterType type;
-        for (String sFilter : strFilters) {
-            type = (mapFilter(sFilter.toUpperCase()));
-            if (filterTypes.contains(mutiallyExclusiveMap.get(type))) {
+        filterTypes = derriveFilterTypes(strFilters);
+
+
+        for (FilterType filterType : filterTypes) {
+            if (filterTypes.contains(mutiallyExclusiveMap.get(filterType))) {
                 String msg = String.format(
                         "The request contains mutually exclusive properties: [%s, %s]",
-                        type, mutiallyExclusiveMap.get(type)
+                        filterType, mutiallyExclusiveMap.get(filterType)
                 );
                 throw new InvalidInputException(msg);
             }
-            filterTypes.add(type);
+            filterTypes.add(filterType);
         }
 
         return filterTypes.stream()
@@ -83,19 +84,32 @@ public class GameConfigBuilderImpl implements GameConfigBuilder {
                 .collect(Collectors.toSet());
     }
 
-    private FilterType mapFilter(String stringFilter) throws InvalidInputException {
-        try {
-            return FilterType.valueOf(stringFilter);
-        } catch (IllegalArgumentException e) {
-            String msg = String.format(
-                    "The property [%s] is wrong.\n" +
-                            "Available properties: [EVEN, ODD, BUZZ, DUCK, PALINDROMIC, GAPFUL, SPY, SQUARE, SUNNY]%n",
-                    stringFilter);
-            throw new InvalidInputException(msg);
+    private Collection<FilterType> derriveFilterTypes(String[] strFilters) throws InvalidInputException {
+        Collection<String> wrongFilterNames = new HashSet<>();
+        Collection<FilterType> filterTypes = new HashSet<>();
+        FilterType type;
+        // Collect filter types and wrong filter names
+        for (String sFilter : strFilters) {
+            try {
+                filterTypes.add(FilterType.valueOf(sFilter.toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                wrongFilterNames.add(sFilter.toUpperCase());
+            }
         }
+        // return if all of them are OK
+        if (wrongFilterNames.isEmpty()) return filterTypes;
+        // if not all of them are OK throw an exception
+        String msg = String.format(
+                "The propert%s [%s] %s wrong.\n" +
+                        "Available properties: " +
+                        "[EVEN, ODD, BUZZ, DUCK, PALINDROMIC, GAPFUL, SPY, SQUARE, SUNNY, JUMPING]%n",
+                wrongFilterNames.size() > 1 ? "ies" : "y",
+                String.join(", ", wrongFilterNames),
+                wrongFilterNames.size() > 1 ? "are" : "is");
+        throw new InvalidInputException(msg);
     }
 
-    private void validateSecondArt(int repeats) throws InvalidInputException {
+    private void validateSecondArg(int repeats) throws InvalidInputException {
         if (!NumberUtils.isNatural(repeats)) {
             throw new InvalidInputException("The second parameter should be a natural number.");
         }

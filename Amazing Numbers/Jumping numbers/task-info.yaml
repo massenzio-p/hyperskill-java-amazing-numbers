@@ -911,6 +911,851 @@ files:
           enum Parameter {ONE, TWO, THREE}
       }
     learner_created: false
+  - name: src/numbers/determiner/GapNumberDeterminer.java
+    visible: true
+    text: |
+      package numbers.determiner;
+      
+      import numbers.NumberReport;
+      
+      class GapNumberDeterminer implements NumbersDeterminer {
+          @Override
+          public boolean getProperty(long number) {
+              String strNumber = Long.toString(number);
+      
+              if (strNumber.length() < 3) return false;
+      
+              int divider = Integer.parseInt(String.format(
+                      "%c%c",
+                      strNumber.charAt(0),
+                      strNumber.charAt(strNumber.length() - 1)));
+              return number % divider == 0;
+          }
+      
+          @Override
+          public void setPropertyInReport(NumberReport report) {
+              report.setGap(getProperty(report.getNumber()));
+          }
+      }
+    learner_created: true
+  - name: src/numbers/config/GameConfig.java
+    visible: true
+    text: |
+      package numbers.config;
+      
+      import numbers.filter.Filter;
+      import numbers.printer.NumbersPrinter;
+      
+      import java.util.Collection;
+      
+      public interface GameConfig {
+          void setStartNumber(long number);
+          long getStartNumber();
+          void setGameMode(GameMode mode);
+          GameMode getMode();
+          void setRepeats(int repeats);
+          int getRepeats();
+          void setFilters(Collection<Filter> filters);
+          Collection<Filter> getFilters();
+      
+          void setPrinter(NumbersPrinter printer);
+          NumbersPrinter getPrinter();
+      }
+    learner_created: true
+  - name: src/numbers/NumberReport.java
+    visible: true
+    text: |
+      package numbers;
+      
+      public interface NumberReport {
+          long getNumber();
+          boolean isEven();
+          boolean isBuzz();
+          boolean isDuck();
+          boolean isPalindromic();
+          boolean isGap();
+          boolean isSpy();
+          boolean isSquare();
+          boolean isSunny();
+          void setEven(boolean isEven);
+          void setBuzz(boolean isBuzz);
+          void setDuck(boolean isDuck);
+          void setPalindromic(boolean isPalindromic);
+          void setGap(boolean isGap);
+          void setSpy(boolean spy);
+          void setSunny(boolean isSunny);
+          void setSquare(boolean isSquare);
+      }
+    learner_created: true
+  - name: src/numbers/filter/FilterFactory.java
+    visible: true
+    text: |
+      package numbers.filter;
+      
+      import numbers.NumberReport;
+      
+      import java.util.HashMap;
+      import java.util.Map;
+      
+      public class FilterFactory {
+          private static final Map<FilterType, Filter> filterCache = new HashMap<>();
+      
+          public static Filter getFilter(FilterType type) {
+              return filterCache.computeIfAbsent(type, FilterFactory::createFilter);
+          }
+      
+          private static Filter createFilter(FilterType type) {
+              return switch (type) {
+                  case EVEN -> (NumberReport::isEven);
+                  case ODD -> (report -> !report.isEven());
+                  case BUZZ -> (NumberReport::isBuzz);
+                  case DUCK -> (NumberReport::isDuck);
+                  case PALINDROMIC -> (NumberReport::isPalindromic);
+                  case GAPFUL -> (NumberReport::isGap);
+                  case SPY -> (NumberReport::isSpy);
+                  case SUNNY -> (NumberReport::isSunny);
+                  case SQUARE -> (NumberReport::isSquare);
+              };
+          }
+      }
+    learner_created: true
+  - name: src/numbers/AmazingNumbersGame.java
+    visible: true
+    text: |
+      package numbers;
+      
+      import numbers.config.GameConfig;
+      import numbers.filter.Filter;
+      import numbers.printer.NumbersPrinter;
+      
+      
+      public interface AmazingNumbersGame {
+      
+          void playAmazingNumbers(GameConfig config);
+      }
+    learner_created: true
+  - name: src/numbers/determiner/NumberDeterminerFactory.java
+    visible: true
+    text: |
+      package numbers.determiner;
+      
+      
+      import java.util.Arrays;
+      import java.util.Collection;
+      import java.util.Set;
+      import java.util.stream.Collectors;
+      
+      public class NumberDeterminerFactory {
+      
+          public static Collection<NumbersDeterminer> getAllTypes() {
+              return Arrays.stream(DeterminerType.values())
+                      .map(NumberDeterminerFactory::createNumberDeterminer)
+                      .collect(Collectors.toSet());
+          }
+      
+          public enum DeterminerType {
+              BUZZ, DUCK, PALINDROMIC, GAP, EVEN, SPY, SUNNY, SQUARE
+          }
+      
+          public static NumbersDeterminer createNumberDeterminer(DeterminerType type) {
+              return switch (type) {
+                  case BUZZ -> new BuzzNumberDeterminer();
+                  case DUCK -> new DuckNumberDeterminer();
+                  case PALINDROMIC -> new PalindromicNumberDeterminer();
+                  case GAP -> new GapNumberDeterminer();
+                  case EVEN -> new EvenDeterminer();
+                  case SPY -> new SpyDeterminer();
+                  case SQUARE -> new SquareDeterminer();
+                  case SUNNY -> new SunnyDeterminer(createNumberDeterminer(DeterminerType.SQUARE));
+              };
+          }
+      }
+    learner_created: true
+  - name: src/numbers/determiner/DuckNumberDeterminer.java
+    visible: true
+    text: |
+      package numbers.determiner;
+      
+      import numbers.NumberReport;
+      
+      class DuckNumberDeterminer implements NumbersDeterminer {
+      
+          @Override
+          public boolean getProperty(long number) {
+              for (char ch : Long.toString(number).toCharArray()) {
+                  if (ch == '0') return true;
+              }
+              return false;
+          }
+      
+          @Override
+          public void setPropertyInReport(NumberReport report) {
+              report.setDuck(getProperty(report.getNumber()));
+          }
+      }
+    learner_created: true
+  - name: src/numbers/AmazingNumberGameImpl.java
+    visible: true
+    text: |
+      package numbers;
+      
+      import numbers.config.GameConfig;
+      import numbers.determiner.NumbersDeterminer;
+      import numbers.filter.Filter;
+      import numbers.printer.NumbersPrinter;
+      
+      import java.util.Collection;
+      
+      public class AmazingNumberGameImpl implements AmazingNumbersGame {
+      
+          private final Collection<NumbersDeterminer> determiners;
+      
+          public AmazingNumberGameImpl(Collection<NumbersDeterminer> determiners) {
+              this.determiners = determiners;
+          }
+      
+          @Override
+          public void playAmazingNumbers(GameConfig config) {
+              for (long num = config.getStartNumber(), counter = 0; counter < config.getRepeats(); num++) {
+                  NumberReport report = new NumberReportModel(num);
+                  for (NumbersDeterminer determiner : determiners) {
+                      determiner.setPropertyInReport(report);
+                  }
+      
+                  Collection<Filter> filters = config.getFilters();
+                  if (filters != null && !filters.isEmpty()) {
+                      boolean continueLoop = false;
+                      for (Filter filter : filters) {
+                          if (!filter.filter(report)) {
+                              continueLoop = true;
+                              break;
+                          }
+                      }
+                      if (continueLoop) continue;
+                  }
+                  counter++;
+                  config.getPrinter().print(report);
+              }
+          }
+      }
+    learner_created: true
+  - name: src/numbers/config/GameMode.java
+    visible: true
+    text: |
+      package numbers.config;
+      
+      public enum GameMode {
+          SINGLE_NUMBER,
+          UNFILTERED_SET_OF_NUMBERS,
+          FILTERED_SET_OF_NUMBERS
+      }
+    learner_created: true
+  - name: src/numbers/determiner/SpyDeterminer.java
+    visible: true
+    text: |
+      package numbers.determiner;
+      
+      import numbers.NumberReport;
+      
+      public class SpyDeterminer implements NumbersDeterminer {
+          @Override
+          public boolean getProperty(long number) {
+              String stringNum = Long.toString(number);
+              long sum = 0;
+              long mult = 1;
+              for (int i = 0; i < stringNum.length(); i++) {
+                  sum += Long.parseLong(String.valueOf(stringNum.charAt(i)));
+                  mult *= Long.parseLong(String.valueOf(stringNum.charAt(i)));
+              }
+              return sum == mult;
+          }
+      
+          @Override
+          public void setPropertyInReport(NumberReport report) {
+              report.setSpy(getProperty(report.getNumber()));
+          }
+      }
+    learner_created: true
+  - name: src/numbers/config/GameConfigBuilderImpl.java
+    visible: true
+    text: |
+      package numbers.config;
+      
+      import numbers.NumberUtils;
+      import numbers.exception.InvalidInputException;
+      import numbers.filter.Filter;
+      import numbers.filter.FilterFactory;
+      import numbers.filter.FilterType;
+      import numbers.printer.NumbersPrinter;
+      import numbers.printer.PrinterFactory;
+      
+      import java.util.*;
+      import java.util.stream.Collectors;
+      
+      
+      public class GameConfigBuilderImpl implements GameConfigBuilder {
+      
+          private final GameConfig config = new GameConfigModel();
+          private final HashMap<FilterType, FilterType> mutiallyExclusiveMap = new HashMap<>() {{
+              put(FilterType.EVEN, FilterType.ODD);
+              put(FilterType.ODD, FilterType.EVEN);
+              put(FilterType.DUCK, FilterType.SPY);
+              put(FilterType.SPY, FilterType.DUCK);
+              put(FilterType.SUNNY, FilterType.SQUARE);
+              put(FilterType.SQUARE, FilterType.SUNNY);
+          }};
+      
+          @Override
+          public GameConfig buildConfig(String[] input) throws InvalidInputException {
+              if (input == null || input.length == 0) throw new InvalidInputException("Input must exist");
+      
+              // check command to exit
+              if (input[0].equals("0")) return null;
+      
+              // check if first param is a natural number
+              GameMode mode = determineGameMode(input);
+              config.setGameMode(mode);
+      
+              long startNumber = Long.parseLong(input[0]);
+              validateFirstArg(startNumber);
+      
+              NumbersPrinter printer;
+              if (mode != GameMode.SINGLE_NUMBER) {
+                  printer = PrinterFactory.createPrintStrategy(PrinterFactory.PrinterMode.BRIEF);
+                  int repeats = Integer.parseInt(input[1]);
+      
+                  validateSecondArt(repeats);
+                  config.setRepeats(repeats);
+      
+                  if (mode == GameMode.FILTERED_SET_OF_NUMBERS) {
+                      String[] strFilters = Arrays.copyOfRange(input, 2, input.length);
+                      Collection<Filter> filters = mapFilters(strFilters);
+                      config.setFilters(filters);
+                  }
+              } else {
+                  config.setRepeats(1);
+                  printer = PrinterFactory.createPrintStrategy(PrinterFactory.PrinterMode.DETAILED);
+              }
+      
+              config.setPrinter(printer);
+              config.setStartNumber(startNumber);
+      
+              return config;
+          }
+      
+          private Collection<Filter> mapFilters(String[] strFilters) throws InvalidInputException {
+              Collection<FilterType> filterTypes = new HashSet<>();
+      
+              FilterType type;
+              for (String sFilter : strFilters) {
+                  type = (mapFilter(sFilter.toUpperCase()));
+                  if (filterTypes.contains(mutiallyExclusiveMap.get(type))) {
+                      String msg = String.format(
+                              "The request contains mutually exclusive properties: [%s, %s]",
+                              type, mutiallyExclusiveMap.get(type)
+                      );
+                      throw new InvalidInputException(msg);
+                  }
+                  filterTypes.add(type);
+              }
+      
+              return filterTypes.stream()
+                      .map(FilterFactory::getFilter)
+                      .collect(Collectors.toSet());
+          }
+      
+          private FilterType mapFilter(String stringFilter) throws InvalidInputException {
+              try {
+                  return FilterType.valueOf(stringFilter);
+              } catch (IllegalArgumentException e) {
+                  String msg = String.format(
+                          "The property [%s] is wrong.\n" +
+                                  "Available properties: [EVEN, ODD, BUZZ, DUCK, PALINDROMIC, GAPFUL, SPY, SQUARE, SUNNY]%n",
+                          stringFilter);
+                  throw new InvalidInputException(msg);
+              }
+          }
+      
+          private void validateSecondArt(int repeats) throws InvalidInputException {
+              if (!NumberUtils.isNatural(repeats)) {
+                  throw new InvalidInputException("The second parameter should be a natural number.");
+              }
+          }
+      
+          private void validateFirstArg(long s) throws InvalidInputException {
+              if (!NumberUtils.isNatural(s)) {
+                  throw new InvalidInputException("\nThe first parameter should be a natural number or zero.");
+              }
+          }
+      
+          private static GameMode determineGameMode(String[] input) {
+              return switch (input.length) {
+                  case 1 -> GameMode.SINGLE_NUMBER;
+                  case 2 -> GameMode.UNFILTERED_SET_OF_NUMBERS;
+                  default -> GameMode.FILTERED_SET_OF_NUMBERS;
+              };
+          }
+      }
+    learner_created: true
+  - name: src/numbers/determiner/SquareDeterminer.java
+    visible: true
+    text: |
+      package numbers.determiner;
+      
+      import numbers.NumberReport;
+      
+      public class SquareDeterminer implements NumbersDeterminer {
+          @Override
+          public boolean getProperty(long number) {
+              return number % Math.sqrt(number) == 0;
+          }
+      
+          @Override
+          public void setPropertyInReport(NumberReport report) {
+              report.setSquare(getProperty(report.getNumber()));
+          }
+      }
+    learner_created: true
+  - name: src/numbers/determiner/PalindromicNumberDeterminer.java
+    visible: true
+    text: |
+      package numbers.determiner;
+      
+      import numbers.NumberReport;
+      
+      class PalindromicNumberDeterminer implements NumbersDeterminer {
+          @Override
+          public boolean getProperty(long number) {
+              String stringNumber = Long.toString(number);
+              for (int i = 0; i < stringNumber.length() / 2; i++) {
+                  if (stringNumber.charAt(i) != stringNumber.charAt(stringNumber.length() - i - 1)) {
+                      return false;
+                  }
+              }
+              return true;
+          }
+      
+          @Override
+          public void setPropertyInReport(NumberReport report) {
+              report.setPalindromic(getProperty(report.getNumber()));
+          }
+      }
+    learner_created: true
+  - name: src/numbers/NumberReportModel.java
+    visible: true
+    text: |
+      package numbers;
+      
+      public class NumberReportModel implements NumberReport {
+      
+          private final long number;
+          private boolean isEven;
+          private boolean isBuzz;
+          private boolean isDuck;
+          private boolean isPalindromic;
+          private boolean isGap;
+          private boolean isSpy;
+      
+          private boolean isSquare;
+          private boolean isSunny;
+      
+          public NumberReportModel(long number) {
+              this.number = number;
+          }
+      
+          @Override
+          public long getNumber() {
+              return this.number;
+          }
+      
+          @Override
+          public boolean isEven() {
+              return this.isEven;
+          }
+          @Override
+          public boolean isBuzz() {
+              return this.isBuzz;
+          }
+          @Override
+          public boolean isDuck() {
+              return this.isDuck;
+          }
+          @Override
+          public boolean isPalindromic() {
+              return this.isPalindromic;
+          }
+          @Override
+          public boolean isGap() {
+              return this.isGap;
+          }
+          @Override
+          public boolean isSquare() {
+              return isSquare;
+          }
+          @Override
+          public boolean isSunny() {
+              return isSunny;
+          }
+      
+          @Override
+          public void setEven(boolean isEven) {
+              this.isEven = isEven;
+          }
+          @Override
+          public void setBuzz(boolean isBuzz) {
+              this.isBuzz = isBuzz;
+          }
+          @Override
+          public void setDuck(boolean isDuck) {
+              this.isDuck = isDuck;
+          }
+          @Override
+          public void setPalindromic(boolean isPalindromic) {
+              this.isPalindromic = isPalindromic;
+          }
+          @Override
+          public void setGap(boolean isGap) {
+              this.isGap = isGap;
+          }
+          @Override
+          public boolean isSpy() {
+              return this.isSpy;
+          }
+          @Override
+          public void setSpy(boolean spy) {
+              this.isSpy = spy;
+          }
+          @Override
+          public void setSquare(boolean isSquare) {
+              this.isSquare = isSquare;
+          }
+          @Override
+          public void setSunny(boolean isSunny) {
+              this.isSunny = isSunny;
+          }
+      }
+    learner_created: true
+  - name: src/numbers/filter/Filter.java
+    visible: true
+    text: |
+      package numbers.filter;
+      
+      import numbers.NumberReport;
+      
+      @FunctionalInterface
+      public interface Filter {
+          boolean filter(NumberReport report);
+      }
+    learner_created: true
+  - name: src/numbers/determiner/EvenDeterminer.java
+    visible: true
+    text: |
+      package numbers.determiner;
+      
+      import numbers.NumberReport;
+      import numbers.NumberUtils;
+      
+      public class EvenDeterminer implements NumbersDeterminer {
+          @Override
+          public boolean getProperty(long number) {
+              return NumberUtils.isEven(number);
+          }
+      
+          @Override
+          public void setPropertyInReport(NumberReport report) {
+              report.setEven(getProperty(report.getNumber()));
+          }
+      }
+    learner_created: true
+  - name: src/numbers/config/GameConfigModel.java
+    visible: true
+    text: |
+      package numbers.config;
+      
+      import numbers.filter.Filter;
+      import numbers.printer.NumbersPrinter;
+      
+      import java.util.Collection;
+      
+      public class GameConfigModel implements GameConfig {
+      
+          private long startNumber;
+          private int repeats;
+          private GameMode gameMode;
+          private Collection<Filter> filters;
+          private NumbersPrinter printer;
+      
+          @Override
+          public void setStartNumber(long number) {
+              this.startNumber = number;
+          }
+          @Override
+          public long getStartNumber() {
+              return this.startNumber;
+          }
+          @Override
+          public void setGameMode(GameMode mode) {
+              this.gameMode = mode;
+          }
+          @Override
+          public GameMode getMode() {
+              return this.gameMode;
+          }
+          @Override
+          public void setRepeats(int repeats) {
+              this.repeats = repeats;
+          }
+          @Override
+          public int getRepeats() {
+              return this.repeats;
+          }
+          @Override
+          public void setFilters(Collection<Filter> filters) {
+              this.filters = filters;
+          }
+          @Override
+          public Collection<Filter> getFilters() {
+              return this.filters;
+          }
+      
+          @Override
+          public void setPrinter(NumbersPrinter printer) {
+              this.printer = printer;
+          }
+      
+          @Override
+          public NumbersPrinter getPrinter() {
+              return this.printer;
+          }
+      }
+    learner_created: true
+  - name: src/numbers/printer/PrinterFactory.java
+    visible: true
+    text: |
+      package numbers.printer;
+      
+      public class PrinterFactory {
+      
+          public enum PrinterMode {
+              BRIEF, DETAILED
+          }
+      
+          public static NumbersPrinter createPrintStrategy(PrinterMode mode) {
+              return switch (mode) {
+                  case BRIEF -> new BriefNumberPrinter();
+                  default -> new DetailedNumberPrinter();
+              };
+          }
+      }
+    learner_created: true
+  - name: src/numbers/config/GameConfigBuilder.java
+    visible: true
+    text: |
+      package numbers.config;
+      
+      import numbers.exception.InvalidInputException;
+      
+      public interface GameConfigBuilder {
+          GameConfig buildConfig(String[] input) throws InvalidInputException;
+      }
+    learner_created: true
+  - name: src/numbers/filter/FilterType.java
+    visible: true
+    text: |
+      package numbers.filter;
+      
+      public enum FilterType {
+          EVEN, ODD, BUZZ, DUCK, PALINDROMIC, GAPFUL, SPY, SQUARE, SUNNY
+      }
+    learner_created: true
+  - name: src/numbers/printer/NumbersPrinter.java
+    visible: true
+    text: |
+      package numbers.printer;
+      
+      import numbers.NumberReport;
+      
+      @FunctionalInterface
+      public interface NumbersPrinter {
+      
+          void print(NumberReport number);
+      }
+    learner_created: true
+  - name: src/numbers/printer/BriefNumberPrinter.java
+    visible: true
+    text: |
+      package numbers.printer;
+      
+      import numbers.NumberReport;
+      import numbers.printer.NumbersPrinter;
+      
+      public class BriefNumberPrinter implements NumbersPrinter {
+          public static final String PATTERN = "             %d is %s%s%s%s%s%s%s%s%n";
+      
+          @Override
+          public void print(NumberReport number) {
+              System.out.printf(
+                      PATTERN,
+                      number.getNumber(),
+                      number.isBuzz() ? "buzz, " : "",
+                      number.isDuck() ? "duck, " : "",
+                      number.isPalindromic() ? "palindromic, " : "",
+                      number.isGap() ? "gapful, " : "",
+                      number.isSpy() ? "spy, " : "",
+                      number.isSquare() ? "square, " : "",
+                      number.isSunny() ? "sunny, " : "",
+                      number.isEven() ? "even" : "odd"
+              );
+          }
+      }
+    learner_created: true
+  - name: src/numbers/exception/InvalidInputException.java
+    visible: true
+    text: |
+      package numbers.exception;
+      
+      public class InvalidInputException extends Exception {
+          public InvalidInputException(String inputMustExist) {
+              super(inputMustExist);
+          }
+      }
+    learner_created: true
+  - name: src/numbers/determiner/BuzzNumberDeterminer.java
+    visible: true
+    text: |
+      package numbers.determiner;
+      
+      import numbers.NumberReport;
+      
+      class BuzzNumberDeterminer implements NumbersDeterminer {
+      
+          private final static int DIVISIBLE_CODE = 1;
+          private final static int ENDS_WITH_7_CODE = 2;
+      
+          @Override
+          public boolean getProperty(long number) {
+              return isBuzz(number);
+          }
+      
+          @Override
+          public void setPropertyInReport(NumberReport report) {
+              report.setBuzz(getProperty(report.getNumber()));
+          }
+      
+          private boolean isBuzz(long number) {
+              int resCode = 0;
+              if (number % 7 == 0) {
+                  resCode += DIVISIBLE_CODE;
+              }
+              if ((number - 7) % 10 == 0) {
+                  resCode += ENDS_WITH_7_CODE;
+              }
+              return resCode > 0;
+          }
+      }
+    learner_created: true
+  - name: src/numbers/determiner/SunnyDeterminer.java
+    visible: true
+    text: |
+      package numbers.determiner;
+      
+      import numbers.NumberReport;
+      
+      public class SunnyDeterminer implements NumbersDeterminer {
+      
+          private final NumbersDeterminer squareDeterminer;
+      
+          public SunnyDeterminer(NumbersDeterminer numberDeterminer) {
+              this.squareDeterminer = numberDeterminer;
+          }
+      
+          @Override
+          public boolean getProperty(long number) {
+              return this.squareDeterminer.getProperty(number + 1);
+          }
+      
+          @Override
+          public void setPropertyInReport(NumberReport report) {
+              report.setSunny(getProperty(report.getNumber()));
+          }
+      }
+    learner_created: true
+  - name: src/numbers/determiner/NumbersDeterminer.java
+    visible: true
+    text: |
+      package numbers.determiner;
+      
+      import numbers.NumberReport;
+      
+      public interface NumbersDeterminer {
+          boolean getProperty(long number);
+          void setPropertyInReport(NumberReport report);
+      }
+    learner_created: true
+  - name: src/numbers/printer/DetailedNumberPrinter.java
+    visible: true
+    text: |
+      package numbers.printer;
+      
+      import numbers.NumberReport;
+      
+      public class DetailedNumberPrinter implements NumbersPrinter {
+      
+          private final static String PATTERN = """
+                  %nProperties of %d
+                                even: %b
+                                 odd: %b
+                                buzz: %b
+                                duck: %b
+                         palindromic: %b
+                              gapful: %b
+                              square: %b
+                               sunny: %b
+                                 spy: %b%n""";
+      
+          @Override
+          public void print(NumberReport number) {
+              System.out.printf(
+                      PATTERN,
+                      number.getNumber(),
+                      number.isEven(),
+                      !number.isEven(),
+                      number.isBuzz(),
+                      number.isDuck(),
+                      number.isPalindromic(),
+                      number.isGap(),
+                      number.isSquare(),
+                      number.isSunny(),
+                      number.isSpy()
+              );
+          }
+      }
+    learner_created: true
+  - name: src/numbers/NumberUtils.java
+    visible: true
+    text: |
+      package numbers;
+      
+      public class NumberUtils {
+      
+          public static boolean isNatural(long number) {
+              if (number > 0) {
+                  return true;
+              }
+              return false;
+          }
+      
+          public static boolean isEven(long number) {
+              return number % 2 == 0;
+          }
+      }
+    learner_created: true
+  - name: src/numbers/determiner/JumpingNumberDeterminer.java
+    visible: true
+    learner_created: true
 feedback_link: https://hyperskill.org/projects/184/stages/937/implement#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: "Sun, 28 Jan 2024 10:03:34 UTC"
 record: -1

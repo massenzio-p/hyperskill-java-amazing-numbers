@@ -4,7 +4,7 @@ import numbers.NumberReport;
 import numbers.printer.NumbersPrinter;
 
 public class BriefNumberPrinter implements NumbersPrinter {
-    public static final String PATTERN = "             %d is %s%s%s%s%s%s%s%s%n";
+    public static final String PATTERN = "             %d is %s%s%s%s%s%s%s%s%s%n";
 
     @Override
     public void print(NumberReport number) {
@@ -18,6 +18,7 @@ public class BriefNumberPrinter implements NumbersPrinter {
                 number.isSpy() ? "spy, " : "",
                 number.isSquare() ? "square, " : "",
                 number.isSunny() ? "sunny, " : "",
+                number.isJumping() ? "jumping, " : "",
                 number.isEven() ? "even" : "odd"
         );
     }

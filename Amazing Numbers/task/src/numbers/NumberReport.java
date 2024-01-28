@@ -10,6 +10,7 @@ public interface NumberReport {
     boolean isSpy();
     boolean isSquare();
     boolean isSunny();
+    boolean isJumping();
     void setEven(boolean isEven);
     void setBuzz(boolean isBuzz);
     void setDuck(boolean isDuck);
@@ -18,4 +19,5 @@ public interface NumberReport {
     void setSpy(boolean spy);
     void setSunny(boolean isSunny);
     void setSquare(boolean isSquare);
+    void setJumping(boolean isJumping);
 }

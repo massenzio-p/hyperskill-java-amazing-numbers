@@ -11,10 +11,11 @@ public class DetailedNumberPrinter implements NumbersPrinter {
                           buzz: %b
                           duck: %b
                    palindromic: %b
+                           spy: %b
                         gapful: %b
                         square: %b
                          sunny: %b
-                           spy: %b%n""";
+                       jumping: %b%n""";
 
     @Override
     public void print(NumberReport number) {
@@ -26,10 +27,11 @@ public class DetailedNumberPrinter implements NumbersPrinter {
                 number.isBuzz(),
                 number.isDuck(),
                 number.isPalindromic(),
+                number.isSpy(),
                 number.isGap(),
                 number.isSquare(),
                 number.isSunny(),
-                number.isSpy()
+                number.isJumping()
         );
     }
 }
