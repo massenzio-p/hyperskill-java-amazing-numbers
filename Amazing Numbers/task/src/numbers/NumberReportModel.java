@@ -12,6 +12,7 @@ public class NumberReportModel implements NumberReport {
     private boolean isSquare;
     private boolean isSunny;
     private boolean isJumping;
+    private boolean isHappy;
 
     public NumberReportModel(long number) {
         this.number = number;
@@ -110,5 +111,15 @@ public class NumberReportModel implements NumberReport {
     @Override
     public void setJumping(boolean isJumping) {
         this.isJumping = isJumping;
+    }
+
+    @Override
+    public boolean isHappy() {
+        return this.isHappy;
+    }
+
+    @Override
+    public void setHappy(boolean isHappy) {
+        this.isHappy = isHappy;
     }
 }

@@ -15,7 +15,9 @@ public class DetailedNumberPrinter implements NumbersPrinter {
                         gapful: %b
                         square: %b
                          sunny: %b
-                       jumping: %b%n""";
+                       jumping: %b
+                         happy: %b
+                           sad: %b%n""";
 
     @Override
     public void print(NumberReport number) {
@@ -31,7 +33,9 @@ public class DetailedNumberPrinter implements NumbersPrinter {
                 number.isGap(),
                 number.isSquare(),
                 number.isSunny(),
-                number.isJumping()
+                number.isJumping(),
+                number.isHappy(),
+                !number.isHappy()
         );
     }
 }

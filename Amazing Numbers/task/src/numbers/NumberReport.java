@@ -11,6 +11,7 @@ public interface NumberReport {
     boolean isSquare();
     boolean isSunny();
     boolean isJumping();
+    boolean isHappy();
     void setEven(boolean isEven);
     void setBuzz(boolean isBuzz);
     void setDuck(boolean isDuck);
@@ -20,4 +21,5 @@ public interface NumberReport {
     void setSunny(boolean isSunny);
     void setSquare(boolean isSquare);
     void setJumping(boolean isJumping);
+    void setHappy(boolean property);
 }

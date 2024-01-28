@@ -15,7 +15,7 @@ public class NumberDeterminerFactory {
     }
 
     public enum DeterminerType {
-        BUZZ, DUCK, PALINDROMIC, GAP, EVEN, SPY, SUNNY, SQUARE, JUMPING
+        BUZZ, DUCK, PALINDROMIC, GAP, EVEN, SPY, SUNNY, SQUARE, JUMPING, HAPPY
     }
 
     public static NumbersDeterminer createNumberDeterminer(DeterminerType type) {
@@ -29,6 +29,7 @@ public class NumberDeterminerFactory {
             case SQUARE -> new SquareDeterminer();
             case SUNNY -> new SunnyDeterminer(createNumberDeterminer(DeterminerType.SQUARE));
             case JUMPING -> new JumpingNumberDeterminer();
+            case HAPPY -> new HappyNumberDeterminer();
         };
     }
 }
